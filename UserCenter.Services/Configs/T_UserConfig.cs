@@ -12,6 +12,7 @@ namespace UserCenter.Services.Configs
     {
         public T_UserConfig()
         {
+            this.ToTable(nameof(T_User) + "s");
             this.Property(p => p.PhoneNum).HasMaxLength(16).IsRequired();
 
             this.Property(p => p.NickName).HasMaxLength(64).IsRequired();

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
+using UserCenter.OpenAPI.App_Start;
 
 namespace UserCenter.OpenAPI
 {
@@ -14,11 +16,27 @@ namespace UserCenter.OpenAPI
             // Web API 路由
             config.MapHttpAttributeRoutes();
 
+   
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
+                name: "Api-v1",
+                routeTemplate: "api/v1/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+            config.Routes.MapHttpRoute(
+                name: "Api-v2",
+                routeTemplate: "api/v2/{controller}/{action}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+            config.Services.Replace(typeof(IHttpControllerSelector), new VersionControllerSelector(config));
+            var authFilter = (AuthorizationFilter)GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(AuthorizationFilter));
+            config.Filters.Add(authFilter);
+
+          
         }
     }
 }

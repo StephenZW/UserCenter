@@ -12,6 +12,7 @@ namespace UserCenter.Services.Configs
     {
         public T_AppInfoConfig()
         {
+            this.ToTable(nameof(T_AppInfo) + "s");
             this.HasKey(t => t.Id);
             this.Property(p => p.Name).HasMaxLength(128).IsRequired();
 

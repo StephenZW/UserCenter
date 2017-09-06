@@ -12,6 +12,7 @@ namespace UserCenter.Services.Configs
     {
         public T_UserGroupConfig()
         {
+            this.ToTable(nameof(T_UserGroup) + "s");
             this.HasRequired(ug => ug.User).WithMany(u => u.UserGroup).HasForeignKey(ug => ug.UserId).WillCascadeOnDelete(false);
 
             this.HasRequired(ug => ug.Group).WithMany(g => g.UserGroup).HasForeignKey(ug => ug.GroupId).WillCascadeOnDelete(false);

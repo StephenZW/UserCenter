@@ -12,6 +12,7 @@ namespace UserCenter.Services.Configs
     {
         public T_GroupConfig()
         {
+            this.ToTable(nameof(T_Group) + "s");
             this.Property(p => p.Name).HasMaxLength(32).IsRequired();
         }
     }
