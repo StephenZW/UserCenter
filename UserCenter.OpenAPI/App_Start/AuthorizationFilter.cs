@@ -50,7 +50,7 @@ namespace UserCenter.OpenAPI.App_Start
                   .Select(kv => kv.Key + "=" + kv.Value)
                   .ToArray();
 
-            string sign2 = Algorithm.ToMD5(string.Join("&", paramArr) + appkey);
+            string sign2 = Algorithm.ToMD5(string.Join("&", paramArr) + appInfo.AppSecret);
 
             if (sign != sign2)
             {

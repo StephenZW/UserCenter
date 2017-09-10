@@ -63,6 +63,7 @@ namespace UserCenter.OpenAPI
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
+          
         }
     }
 }
