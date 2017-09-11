@@ -18,7 +18,21 @@ namespace UserCenter.Services
         {
             this.Db = context;
         }
-
+        public async Task<long> AddNewAsync(string name)
+        {
+            if (base.Entities.Any(g => g.Name == name))
+            {
+                throw new InvalidOperationException("该分组已存在！");
+            }
+            var group = new T_Group()
+            {
+                CreateDate = DateTime.Now,
+                Name = name
+            };
+            this.Entities.Add(group);
+            await this.Db.SaveChangesAsync();
+            return group.Id;
+        }
         public async Task<GroupDTO> GetByIdAsync(long id)
         {
             var group = await base.GetByIdAsync(id);
@@ -76,7 +90,7 @@ namespace UserCenter.Services
             var userGroups = this.Db.Set<T_UserGroup>();
             var userGroup = await userGroups
                  .SingleOrDefaultAsync(ug => ug.UserId == userId && ug.GroupId == groupId);
-            if (userGroup!=null)
+            if (userGroup != null)
             {
                 userGroups.Remove(userGroup);
                 await this.Db.SaveChangesAsync();

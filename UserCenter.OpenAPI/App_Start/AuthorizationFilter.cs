@@ -1,15 +1,22 @@
-﻿using System;
+﻿using JWT;
+using JWT.Serializers;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using UserCenter.Common;
+using UserCenter.DTO;
 using UserCenter.IServices;
+using UserCenter.OpenAPI.Controllers.v1;
+
 
 namespace UserCenter.OpenAPI.App_Start
 {
@@ -22,15 +29,56 @@ namespace UserCenter.OpenAPI.App_Start
         {
             this._appInfoService = appInfoService;
         }
+
+        Regex version = new Regex(@"\.v(\d+)$");
+
         public bool AllowMultiple => true;
 
         public async Task<HttpResponseMessage> ExecuteAuthorizationFilterAsync(HttpActionContext actionContext, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>> continuation)
         {
-            if (actionContext.ControllerContext.ControllerDescriptor.ControllerName.Equals("AppInfoController"))
+            var attrs = actionContext.ActionDescriptor.GetCustomAttributes<SkipAuthAttribute>(true);
+            if (attrs.Count == 1)
+            {
+                return await continuation();
+            }
+            attrs = actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<SkipAuthAttribute>(true);
+            if (attrs.Count == 1)
             {
                 return await continuation();
             }
             var headers = actionContext.Request.Headers;
+
+            var cNameSpace = actionContext.ControllerContext.ControllerDescriptor.ControllerType.Namespace;
+            var match = version.Match(cNameSpace);
+            if (match.Success
+                && float.TryParse(match.Groups[1].Value, out var v)
+                && v > 2)
+            {
+                if (!headers.TryGetValues("JWT", out var jwt))
+                {
+                    return Content(HttpStatusCode.Unauthorized, "JWT为空");
+                }
+                try
+                {
+                    IJsonSerializer serializer = new JsonNetSerializer();
+                    IDateTimeProvider provider = new UtcDateTimeProvider();
+                    IJwtValidator validator = new JwtValidator(serializer, provider);
+                    IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
+                    IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder);
+                    var secret = WebHelper.AppSetting(WebHelper.jwtKey);
+                    var data = decoder.DecodeToObject<Payload>(jwt.FirstOrDefault(), secret, true);
+                    return await continuation();
+                }
+                catch (TokenExpiredException)
+                {
+                    return Content(HttpStatusCode.Unauthorized, "Token 已过期");
+                }
+                catch (SignatureVerificationException)
+                {
+                    return Content(HttpStatusCode.Unauthorized, "签名错误！");
+                }
+            }
+
             if (!headers.TryGetValues("AppKey", out var appKeys))
             {
                 return Content(HttpStatusCode.Unauthorized, "AppKey为空");
@@ -70,5 +118,19 @@ namespace UserCenter.OpenAPI.App_Start
                 Content = new StringContent(content)
             };
         }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    public class SkipAuthAttribute : Attribute
+    {
+
+    }
+
+    public class Payload : UserDTO
+    {
+        /// <summary>
+        /// 过期时间
+        /// </summary>
+        public double exp { get; set; }
     }
 }

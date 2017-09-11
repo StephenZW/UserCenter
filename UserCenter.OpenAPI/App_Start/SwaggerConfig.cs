@@ -63,6 +63,7 @@ namespace UserCenter.OpenAPI
                             {
                                 vc.Version("v1", "UserCenter.OpenAPI 版本 v1");
                                 vc.Version("v2", "UserCenter.OpenAPI 版本 v2");
+                                vc.Version("v3", "UserCenter.OpenAPI 版本 v3 JWT验证");
                             });
 
                         // You can use "BasicAuth", "ApiKey" or "OAuth2" options to describe security schemes for the API.
@@ -402,12 +403,12 @@ namespace UserCenter.OpenAPI
             _apiVersions.TryGetValue(apiVersion, out info);
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
-
+             float.TryParse(Regex.Match(apiVersion, @"^v(\d+)$").Groups[1].Value, out var v);
             var paths = GetApiDescriptionsFor(apiVersion)
                 .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
+                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry,v));
 
             var rootUri = new Uri(rootUrl);
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
@@ -500,7 +501,7 @@ namespace UserCenter.OpenAPI
             return okApiDesc.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion)).ToList();
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry,float apiVersion)
         {
             var pathItem = new PathItem();
 
@@ -519,25 +520,25 @@ namespace UserCenter.OpenAPI
                 switch (httpMethod)
                 {
                     case "get":
-                        pathItem.get = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.get = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "put":
-                        pathItem.put = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.put = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "post":
-                        pathItem.post = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.post = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "delete":
-                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "options":
-                        pathItem.options = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.options = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "head":
-                        pathItem.head = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.head = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "patch":
-                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                 }
             }
@@ -545,7 +546,7 @@ namespace UserCenter.OpenAPI
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry)
+        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry, float apiVersion)
         {
             var parameters = apiDesc.ParameterDescriptions
                 .Select(paramDesc =>
@@ -572,8 +573,21 @@ namespace UserCenter.OpenAPI
                 responses = responses,
                 deprecated = apiDesc.IsObsolete() ? true : (bool?)null
             };
-            operation.parameters.Insert(0, new Parameter { name = "AppKey", @in = "header", description = "客户端标识", required = false, type = "string" });
-            operation.parameters.Insert(1, new Parameter { name = "Sign", @in = "header", description = "签名", required = false, type = "string" });
+            
+            if (apiVersion>2)
+            {
+                operation.parameters.Insert(0, new Parameter { name = "JWT", @in = "header", description = "Json Web Token", required = false, type = "string" });
+            }
+            else
+            {
+                //appInfo控制器排除
+                if (apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName!=nameof(Controllers.v1.AppInfoController))
+                {
+                    operation.parameters.Insert(0, new Parameter { name = "AppKey", @in = "header", description = "客户端标识", required = false, type = "string" });
+                    operation.parameters.Insert(1, new Parameter { name = "Sign", @in = "header", description = "签名", required = false, type = "string" });
+                }
+            }
+            
 
             foreach (var filter in _options.OperationFilters)
             {

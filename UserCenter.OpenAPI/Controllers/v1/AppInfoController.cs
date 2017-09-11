@@ -8,12 +8,14 @@ using System.Web.Http;
 using UserCenter.Common;
 using UserCenter.DTO;
 using UserCenter.IServices;
+using UserCenter.OpenAPI.App_Start;
 
 namespace UserCenter.OpenAPI.Controllers.v1
 {
     /// <summary>
     /// appkey 管理
     /// </summary>
+    [SkipAuth]
     public class AppInfoController : ApiController
     {
         public IAppInfoService AppInfoService { get; set; }
@@ -24,6 +26,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="appKey">key</param>
         /// <param name="params">参数</param>
         /// <returns></returns>
+        [HttpPatch]
         public async Task<string> Sign(string appKey, string @params)
         {
             @params = @params.Trim('?', ' ');
@@ -34,7 +37,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
             {
                 return "AppKey错误";
             }
-            return Algorithm.ToMD5(result + appInfo.AppSecret);
+            return "签名：" + Algorithm.ToMD5(result + appInfo.AppSecret);
 
         }
 
@@ -44,9 +47,10 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="name">key 名字描述</param>
         /// <param name="appKey">key</param>
         /// <returns></returns>
-        public async Task<long> AddNew(string name, string appKey)
+        [HttpPut]
+        public async Task<string> AddNew(string name, string appKey)
         {
-            return await AppInfoService.AddNewAsync(name, appKey);
+            return "新增成功，Id=" + await AppInfoService.AddNewAsync(name, appKey);
         }
         /// <summary>
         /// 获取key 信息

@@ -17,6 +17,11 @@ namespace UserCenter.OpenAPI.Controllers.v1
     {
         public IGroupService GroupService { get; set; }
 
+        [HttpPut]
+        public async Task<string> AddNew(string name)
+        {
+            return "新增成功，Id=" + await GroupService.AddNewAsync(name);
+        }
         /// <summary>
         /// 将用户添加到指定分组
         /// </summary>

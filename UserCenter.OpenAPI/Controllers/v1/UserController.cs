@@ -25,9 +25,9 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="password">密码</param>
         /// <returns>id long</returns>
         [HttpPost]
-        public async Task<long> AddNew(string phoneNum,string nickName,string password)
+        public async Task<string> AddNew(string phoneNum,string nickName,string password)
         {
-            return await UserService.AddNewAsync(phoneNum, nickName, password);
+            return "新增成功，Id=" + await UserService.AddNewAsync(phoneNum, nickName, password);
         }
         /// <summary>
         /// test -- v1

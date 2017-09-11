@@ -16,7 +16,6 @@ namespace UserCenter.OpenAPI
             // Web API 路由
             config.MapHttpAttributeRoutes();
 
-   
             config.Routes.MapHttpRoute(
                 name: "Api-v1",
                 routeTemplate: "api/v1/{controller}/{action}/{id}",
@@ -28,6 +27,11 @@ namespace UserCenter.OpenAPI
                 defaults: new { id = RouteParameter.Optional }
             );
             config.Routes.MapHttpRoute(
+                 name: "Api-v3",
+                 routeTemplate: "api/v3/{controller}/{action}/{id}",
+                 defaults: new { id = RouteParameter.Optional }
+             );
+            config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { id = RouteParameter.Optional }
@@ -36,7 +40,7 @@ namespace UserCenter.OpenAPI
             var authFilter = (AuthorizationFilter)GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(AuthorizationFilter));
             config.Filters.Add(authFilter);
 
-          
+
         }
     }
 }
