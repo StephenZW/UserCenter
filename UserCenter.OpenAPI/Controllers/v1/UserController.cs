@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using UserCenter.DTO;
 using UserCenter.IServices;
 
 namespace UserCenter.OpenAPI.Controllers.v1
@@ -37,5 +38,44 @@ namespace UserCenter.OpenAPI.Controllers.v1
         {
             return DateTime.Now.ToString() + "---v1---";
         }
-    }
+
+        /// <summary>
+        /// 检查是否登录
+        /// </summary>
+        /// <param name="phoneNum">手机</param>
+        /// <param name="password">密码</param>
+        /// <returns></returns>
+        public async Task<bool> CheckLogin(string phoneNum, string password)
+        {
+            return await UserService.CheckLoginAsync(phoneNum, password);
+        }
+
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="id">用户id</param>
+        /// <returns></returns>
+        public async Task<UserDTO> GetById(long id)
+        {
+            return await UserService.GetByIdAsync(id);
+        }
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="phoneNum">手机</param>
+        /// <returns></returns>
+        public async Task<UserDTO> GetByPhoneNum(string phoneNum)
+        {
+            return await UserService.GetByPhoneNumAsync(phoneNum);
+        }
+        /// <summary>
+        /// 检查该手机号码是否注册
+        /// </summary>
+        /// <param name="phoneNum">手机</param>
+        /// <returns></returns>
+        public async Task<bool> UserExists(string phoneNum)
+        {
+            return await UserService.UserExistsAsync(phoneNum);
+        }
+    } 
 }

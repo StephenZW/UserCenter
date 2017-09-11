@@ -36,7 +36,8 @@ namespace UserCenter.Services
                 PhoneNum = phoneNum
             };
             base.Entities.Add(user);
-            return await this.Db.SaveChangesAsync();
+            await this.Db.SaveChangesAsync();
+            return user.Id;
 
         }
 

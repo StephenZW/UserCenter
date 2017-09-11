@@ -10,5 +10,7 @@ namespace UserCenter.IServices
     public interface IAppInfoService: IServiceTag
     {
         Task<AppInfoDTO> GetByAppKeyAsync(string appKey);
+
+        Task<long> AddNewAsync(string name, string appKey);
     }
 }

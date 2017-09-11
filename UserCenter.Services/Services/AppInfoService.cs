@@ -24,7 +24,28 @@ namespace UserCenter.Services
             return ToDTO(appInfo);
         }
 
-         static AppInfoDTO ToDTO(T_AppInfo appInfo)
+        public async Task<long> AddNewAsync(string name, string appKey)
+        {
+            var isAny = await this.Entities.AnyAsync(a => a.AppKey == appKey);
+            if (isAny)
+            {
+                throw new InvalidOperationException("该 AppKey 已存在");
+            }
+            var appSecret = Guid.NewGuid().ToString("N");
+            var appInfo = new T_AppInfo()
+            {
+                CreateDate = DateTime.Now,
+                AppKey = appKey,
+                AppSecret = appSecret,
+                Name = name,
+                IsEnabled = false
+            };
+            base.Entities.Add(appInfo);
+            return await this.Db.SaveChangesAsync();
+
+        }
+
+        static AppInfoDTO ToDTO(T_AppInfo appInfo)
         {
             if (appInfo == null)
             {

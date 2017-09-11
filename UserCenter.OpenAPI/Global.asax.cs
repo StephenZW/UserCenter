@@ -58,7 +58,7 @@ namespace UserCenter.OpenAPI
             config.Formatters.Remove(config.Formatters.XmlFormatter);
 
             //EF初始化模式为空
-            Database.SetInitializer<UserCenterContext>(null);
+            //Database.SetInitializer<UserCenterContext>(null);
 
 
             GlobalConfiguration.Configure(WebApiConfig.Register);

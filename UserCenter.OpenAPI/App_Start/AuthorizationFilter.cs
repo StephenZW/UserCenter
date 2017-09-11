@@ -26,6 +26,10 @@ namespace UserCenter.OpenAPI.App_Start
 
         public async Task<HttpResponseMessage> ExecuteAuthorizationFilterAsync(HttpActionContext actionContext, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>> continuation)
         {
+            if (actionContext.ControllerContext.ControllerDescriptor.ControllerName.Equals("AppInfoController"))
+            {
+                return await continuation();
+            }
             var headers = actionContext.Request.Headers;
             if (!headers.TryGetValues("AppKey", out var appKeys))
             {
