@@ -16,8 +16,12 @@ namespace UserCenter.OpenAPI.Controllers.v1
     public class GroupController : ApiController
     {
         public IGroupService GroupService { get; set; }
-
-        [HttpPut]
+        /// <summary>
+        /// 新增分组
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+       [HttpPost]
         public async Task<string> AddNew(string name)
         {
             return "新增成功，Id=" + await GroupService.AddNewAsync(name);
@@ -28,6 +32,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="groupId">分组id</param>
         /// <param name="userId">用户id</param>
         /// <returns></returns>
+        [HttpPut]
         public async Task<bool> AddUserToGroup(long groupId, long userId)
         {
             await GroupService.AddUserToGroupAsync(groupId, userId);
@@ -38,6 +43,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="id">分组id</param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<GroupDTO> GetById(long id)
         {
             return await GroupService.GetByIdAsync(id);
@@ -47,6 +53,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="userId">用户id</param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<GroupDTO[]> GetGroups(long userId)
         {
             return await GroupService.GetGroupsAsync(userId);
@@ -56,6 +63,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="groupId">分组id</param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<UserDTO[]> GetUsers(long groupId)
         {
             return await GroupService.GetGroupUsersAsync(groupId);
@@ -66,6 +74,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="groupId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
+        [HttpPut]
         public async Task<bool> RemoveGroupUser(long groupId, long userId)
         {
             await GroupService.RemoveUserFromGroupAsync(groupId, userId);

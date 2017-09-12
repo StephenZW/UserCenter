@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Filters;
@@ -60,6 +61,12 @@ namespace UserCenter.OpenAPI
             //EF初始化模式为空
             //Database.SetInitializer<UserCenterContext>(null);
 
+            #region 初始数据库
+            var uService = container.Resolve<IUserService>();
+            var gService = container.Resolve<IGroupService>();
+            var aService = container.Resolve<IAppInfoService>();
+            Task.Run(() => DbInitializer.Initialize(uService, gService, aService).Wait()); 
+            #endregion
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
 

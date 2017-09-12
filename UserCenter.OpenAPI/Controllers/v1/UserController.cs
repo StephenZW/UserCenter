@@ -45,6 +45,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// <param name="phoneNum">手机</param>
         /// <param name="password">密码</param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<bool> CheckLogin(string phoneNum, string password)
         {
             return await UserService.CheckLoginAsync(phoneNum, password);
@@ -55,6 +56,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="id">用户id</param>
         /// <returns></returns>
+       [HttpGet]
         public async Task<UserDTO> GetById(long id)
         {
             return await UserService.GetByIdAsync(id);
@@ -64,6 +66,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="phoneNum">手机</param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<UserDTO> GetByPhoneNum(string phoneNum)
         {
             return await UserService.GetByPhoneNumAsync(phoneNum);
@@ -73,6 +76,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="phoneNum">手机</param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<bool> UserExists(string phoneNum)
         {
             return await UserService.UserExistsAsync(phoneNum);

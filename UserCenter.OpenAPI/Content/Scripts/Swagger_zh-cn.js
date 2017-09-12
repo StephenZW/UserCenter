@@ -112,7 +112,7 @@ var SwaggerTranslator = (function () {
         translate: function () {
             document.title = "API描述文档";
             $('body').append('<style type="text/css">.controller-summary{color:#10a54a !important;word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px;text-align:right;cursor:default;} </style>');
-            $("#logo").html("接口描述").attr("href", "/Home/Index");
+            $("#logo").html("接口描述").attr("href", "javascript:;");
             //设置控制器描述
             _setControllerSummary();
             _translator2Cn();

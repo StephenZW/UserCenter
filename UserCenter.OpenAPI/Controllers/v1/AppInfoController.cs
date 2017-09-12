@@ -57,6 +57,7 @@ namespace UserCenter.OpenAPI.Controllers.v1
         /// </summary>
         /// <param name="appKey">key</param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<AppInfoDTO> GetByAppKey(string appKey)
         {
             return await AppInfoService.GetByAppKeyAsync(appKey);

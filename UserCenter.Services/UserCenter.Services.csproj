@@ -51,13 +51,14 @@
     <Compile Include="Configs\T_GroupConfig.cs" />
     <Compile Include="Configs\T_UserConfig.cs" />
     <Compile Include="Configs\T_UserGroupConfig.cs" />
+    <Compile Include="DbContexts\DbInitializer.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\T_AppInfo.cs" />
     <Compile Include="Entities\T_Group.cs" />
     <Compile Include="Entities\T_User.cs" />
     <Compile Include="Entities\T_UserGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DbContext\UserCenterContext.cs" />
+    <Compile Include="DbContexts\UserCenterContext.cs" />
     <Compile Include="Services\AppInfoService.cs" />
     <Compile Include="Services\BaseService.cs" />
     <Compile Include="Services\GroupService.cs" />
